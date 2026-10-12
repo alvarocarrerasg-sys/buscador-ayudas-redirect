@@ -1,0 +1,30 @@
+name: Deploy OVH redirect
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".htaccess"
+      - ".github/workflows/deploy-ovh-redirect.yml"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install SFTP client
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+      - name: Upload redirect to OVH
+        env:
+          OVH_FTP_PASSWORD: ${{ secrets.OVH_FTP_PASSWORD }}
+        run: |
+          test -n "$OVH_FTP_PASSWORD"
+          lftp -u "buscadg,$OVH_FTP_PASSWORD" "sftp://ftp.cluster129.hosting.ovh.net:22" -e '
+            set sftp:auto-confirm yes;
+            put .htaccess -o www/.htaccess;
+            bye
+          '
