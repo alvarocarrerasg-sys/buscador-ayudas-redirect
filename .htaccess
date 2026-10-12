@@ -1,0 +1,4 @@
+RewriteEngine On
+
+RewriteCond %{HTTP_HOST} ^buscadorayudas\.es$ [NC]
+RewriteRule ^(.*)$ https://www.buscadorayudas.es/$1 [R=301,L,NE]
